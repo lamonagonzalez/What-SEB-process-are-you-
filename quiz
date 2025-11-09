@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Which Scheme Eligibility Process Are You?</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #fdf6ff;
+        color: #333;
+        text-align: center;
+        margin: 0;
+        padding: 0;
+    }
+    h1 {
+        margin-top: 20px;
+        color: #6a0dad;
+    }
+    .quiz-container {
+        max-width: 600px;
+        margin: 20px auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .question {
+        font-size: 1.2em;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        opacity: 0;
+        animation: fadeIn 0.8s forwards;
+    }
+    .icon {
+        font-size: 2em;
+        animation: bounce 1.2s infinite;
+    }
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .answers button {
+        display: block;
+        width: 100%;
+        margin: 8px 0;
+        padding: 10px;
+        font-size: 1em;
+        border: none;
+        border-radius: 5px;
+        background: #e0e0e0;
+        cursor: pointer;
+        transition: background 0.3s;
+        opacity: 0;
+        animation: fadeIn 0.8s forwards;
+    }
+    .answers button:hover {
+        background: #d1c4e9;
+    }
+    .progress-bar {
+        height: 20px;
+        background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+        width: 0%;
+        border-radius: 10px;
+        margin: 15px 0;
+        transition: width 0.5s;
+    }
+    .result {
+        display: none;
+        font-size: 1.2em;
+        margin-top: 20px;
+        opacity: 0;
+        animation: fadeIn 1s forwards;
+    }
+    .confetti {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        overflow: hidden;
+    }
+    .music-toggle {
+        margin-top: 15px;
+        font-size: 0.9em;
+        cursor: pointer;
+        color: #6a0dad;
+        background: #f3e5f5;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+    }
+    .music-toggle:hover {
+        background: #d1c4e9;
+    }
+</style>
+</head>
+<body>
+
+<h1>Which Scheme Eligibility Process Are You?</h1>
+<div class="quiz-container">
+    <div id="quiz">
+        <div class="progress-bar" id="progress"></div>
+        <div id="question-container"></div>
+    </div>
+    <div class="result" id="result"></div>
+    <button class="music-toggle" onclick="toggleMusic()">🔊 Toggle Background Music</button>
+</div>
+
+<canvas class="confetti" id="confetti"></canvas>
+
+<!-- Audio Elements -->
+<audio id="question-sound" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
+<audio id="cheer-sound" src="https://www.soundjay.com/button/sounds/button-09.mp3"></audio>
+<audio id="bg-music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" loop></audio>
+
+<script>
+const questions = [
+    { icon: "🍕", q: "What's your go-to comfort food?", a: ["Pizza", "Ice cream", "Tacos", "Sushi"] },
+    { icon: "🐶", q: "Which pet matches your vibe?", a: ["Dog", "Cat", "Goldfish", "Parrot"] },
+    { icon: "🎬", q: "What's your movie night pick?", a: ["Action", "Rom-Com", "Documentary", "Sci-Fi"] },
+    { icon: "🌍", q: "Where would you teleport right now?", a: ["Beach", "Mountains", "Space", "City"] },
+    { icon: "🎵", q: "What's your jam?", a: ["Pop", "Rock", "Classical", "Hip-Hop"] },
+    { icon: "☕", q: "How do you take your coffee?", a: ["Black", "With milk", "I prefer tea", "I don't drink coffee"] },
+    { icon: "📱", q: "What's your phone habit?", a: ["Always scrolling", "Rarely check", "Lost it again", "Only for calls"] },
+    { icon: "🎨", q: "What's your creative outlet?", a: ["Painting", "Writing", "Cooking", "Music"] },
+    { icon: "🛌", q: "Ideal weekend plan?", a: ["Sleep all day", "Adventure outdoors", "Netflix binge", "Party hard"] },
+    { icon: "🎉", q: "How do you celebrate wins?", a: ["Quiet smile", "Dance party", "Confetti cannon", "Treat yourself"] }
+];
+
+const results = [
+    {
+        title: "Access Request Wizard",
+        desc: "You’re the Gandalf of paperwork: “You shall not pass… without proper documentation!” Rules are your jam, and you’d probably laminate your grocery list. If life had a manual, you’d write it, illustrate it, and add footnotes. You secretly judge people who don’t color-code their calendars."
+    },
+    {
+        title: "Evidence Collector Extraordinaire",
+        desc: "You’re the ultimate detective. If socks go missing, you’ll interrogate the laundry basket until it confesses. You’ve got the instincts of Sherlock Holmes and the persistence of a toddler asking “why?” 47 times. If there’s a breadcrumb trail, you’ll follow it—even if it leads to snacks."
+    },
+    {
+        title: "Eligibility Decision Dynamo",
+        desc: "You make decisions faster than a toddler saying “no.” Pineapple on pizza? You’ve already ruled. You weigh facts, apply logic, and deliver verdicts like Judge Judy on a caffeine rush. People trust you because you’re decisive—even if you secretly Google everything first."
+    },
+    {
+        title: "Review & Reassess Rockstar",
+        desc: "You’re the human “Are you sure?” button. You double-check the oven, then triple-check it, then call a friend to confirm. You love second chances so much you’d re-watch a movie just to see if you missed a plot twist. Your motto: “Measure twice, cut once… then measure again just in case.”"
+    },
+    {
+        title: "Complex Case Conqueror",
+        desc: "You thrive in chaos like a cat in a yarn factory. Multi-layered problems? Bring it on. If life hands you a Rubik’s cube, you solve it blindfolded while juggling flaming marshmallows. You laugh in the face of complexity and probably have a spreadsheet for your spreadsheets."
+    }
+];
+
+let currentQuestion = 0;
+let score = 0;
+
+const questionContainer = document.getElementById('question-container');
+const progressBar = document.getElementById('progress');
+const resultDiv = document.getElementById('result');
+const questionSound = document.getElementById('question-sound');
+const cheerSound = document.getElementById('cheer-sound');
+const bgMusic = document.getElementById('bg-music');
+
+function showQuestion() {
+    if (currentQuestion < questions.length) {
+        const q = questions[currentQuestion];
+        questionContainer.innerHTML = `
+            <div class="question"><span class="icon">${q.icon}</span>${q.q}</div>
+            <div class="answers">
+                ${q.a.map((answer, i) => `<button onclick="nextQuestion(${i})">${answer}</button>`).join('')}
+            </div>
+        `;
+        progressBar.style.width = ((currentQuestion / questions.length) * 100) + '%';
+        questionSound.play(); // Play sound when question appears
+    } else {
+        showResult();
+    }
+}
+
+function nextQuestion(choice) {
+    score += choice; // simple scoring
+    currentQuestion++;
+    showQuestion();
+}
+
+function showResult() {
+    progressBar.style.width = '100%';
+    const resultIndex = score % results.length;
+    const r = results[resultIndex];
+    questionContainer.style.display = 'none';
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = `<h2>${r.title}</h2><p>${r.desc}</p>`;
+    resultDiv.style.animation = 'fadeIn 1s forwards';
+    launchConfetti();
+    cheerSound.play();
+}
+
+function launchConfetti() {
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const pieces = [];
+    for (let i = 0; i < 150; i++) {
+        pieces.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height,
+            size: Math.random() * 10 + 5,
+            color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+            speed: Math.random() * 3 + 2
+        });
+    }
+    let startTime = Date.now();
+    function draw() {
+        const elapsed = Date.now() - startTime;
+        if (elapsed > 5000) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear confetti after 5s
+            return;
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+            ctx.fillStyle = p.color;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+            p.y += p.speed;
+            if (p.y > canvas.height) p.y = -10;
+        });
+        requestAnimationFrame(draw);
+    }
+    draw();
+}
+
+function toggleMusic() {
+    if (bgMusic.paused) {
+        bgMusic.volume = 0.2; // subtle volume
+        bgMusic.play();
+    } else {
+        bgMusic.pause();
+    }
+}
+
+showQuestion();
+</script>
